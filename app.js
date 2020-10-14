@@ -96,9 +96,43 @@ function addRole() {
         });
 }
 
-function addEmployee() {
-    // add employee is like add role but with two tables to list
-    // list the employees & roles to choose from
+async function addEmployee() {
+    var positions = await connection.query('SELECT id, title FROM role');
+    var managers = await connection.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee');
+    managers.push({ id: null, Manager: "None" });
+
+    inquirer.prompt([
+        {
+            name: "firstName",
+            type: "input",
+            message: "Enter employee's first name:",
+            validate: confirmStringInput
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "Enter employee's last name:",
+            validate: confirmStringInput
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "Choose employee role:",
+            choices: positions.map(obj => obj.title)
+        },
+        {
+            name: "manager",
+            type: "list",
+            message: "Choose the employee's manager:",
+            choices: managers.map(obj => obj.Manager)
+        }
+    ]).then(answers => {
+        var positionDetails = positions.find(obj => obj.title === answers.role);
+        var manager = managers.find(obj => obj.Manager === answers.manager);
+        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
+        console.log("employee saved");
+        init();
+    });
 }
 
 function viewRole() {
