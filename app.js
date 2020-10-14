@@ -25,6 +25,7 @@ function init() {
             'VIEW_DEPARTMENT',
             'VIEW_ROLE',
             'VIEW_EMPLOYEE',
+            'UPDATE_EMPLOYEE_ROLE',
             'END'
         ],
         name: 'choice'
@@ -48,9 +49,12 @@ function init() {
                                 if (answer.choice === 'VIEW_DEPARTMENT') {
                                     viewDepartment();
                                 } else
-                                    if (answer.choice === 'END') {
-                                        connection.end();
-                                    }
+                                    if (answer.choice === 'UPDATE_EMPLOYEE_ROLE') {
+                                        updateEmployeeRole();
+                                    } else
+                                        if (answer.choice === 'END') {
+                                            connection.end();
+                                        }
         })
 }
 
@@ -96,6 +100,67 @@ function addRole() {
         });
 }
 
+function updateEmployeeRole() {
+
+    connection.queryPromise('SELECT first_name, last_name  FROM employee')
+    .then(employees => {
+        person = employees.map(employee => {
+            return {
+                name: employee.first_name + ' ' + employee.last_name,
+                id: employee.id
+            };
+        
+        
+        })
+        connection.queryPromise(`select id, title FROM role`)
+        .then(roles => {
+            role_title = roles.map(role => {
+                return {
+                    id: role.id,
+                    name: role.title,
+                    //last: manager.last_name,
+                    //role_id: manager.role_id,    
+                    //manager_id: manager.manager_id
+                };
+            })
+            return inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'name',
+                    choices: person, 
+                    message: 'Who do you want to update: '
+                },
+                {
+                    type: 'list',
+                    name: 'newrole',
+                    choices: role_title,
+                    message: 'What is new role '
+                }
+            ]);
+
+    
+        })
+
+        .then(function(answers) {
+            var the_person = person.find(obj => obj.name === answers.name);
+            var new_role = role_title.find(obj => obj.title === answers.newrole);
+            console.log (the_person);
+            console.log (new_role);
+
+            connection.queryPromise('UPDATE employee SET (role_id) where id = (id) VALUES(?,?);', [
+                new_role.id,
+                the_person.id
+            ]);
+            console.log('Role updated.');
+            init();
+        });
+    
+    
+    })
+        
+
+}
+
 function addDepartment() {
 
     inquirer.prompt([
@@ -104,13 +169,13 @@ function addDepartment() {
             name: 'department',
             message: 'Enter the department name: ',
         },
-    ]) .then(answers => {
-    connection.queryPromise('INSERT INTO department (name) VALUES(?);', [
-        answers.department
-    ]);
-    console.log('Department saved.');
-    init();
-})
+    ]).then(answers => {
+        connection.queryPromise('INSERT INTO department (name) VALUES(?);', [
+            answers.department
+        ]);
+        console.log('Department saved.');
+        init();
+    })
 
 
 }
@@ -236,12 +301,12 @@ function viewEmployee() {
         });
 }
 
-function viewDepartment(){
+function viewDepartment() {
     connection.queryPromise(`
         SELECT name
         FROM department`)
         .then(department => {
             console.table(department);
             init();
-        });    
+        });
 }
