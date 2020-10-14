@@ -41,16 +41,16 @@ function init() {
                     } else
                         if (answer.choice === 'VIEW_EMPLOYEE') {
                             viewEmployee();
-                        } else 
+                        } else
                             if (answer.choice === 'ADD_DEPARTMENT') {
                                 addDepartment()
-                        } else
-                            if (answer.choice === 'VIEW_DEPARTMENT') {
-                                viewDepartment();
                             } else
-                                if (answer.choice === 'END') {
-                                    connection.end();
-                                }
+                                if (answer.choice === 'VIEW_DEPARTMENT') {
+                                    viewDepartment();
+                                } else
+                                    if (answer.choice === 'END') {
+                                        connection.end();
+                                    }
         })
 }
 
@@ -98,38 +98,92 @@ function addRole() {
 
 function addEmployee() {
     connection.queryPromise('SELECT * FROM role')
-    .then(roles => {
-        roles = roles.map(role => {
-            return {
-                value: role.id, 
-                name: role.title,
-                salary: role.salary,
-                department_id: role.department_id
-            };
-            
-        });
+        .then(roles => {
+            roles = roles.map(role => {
+                return {
+                    role_id: role.id,
+                    name: role.title,
+                    //salary: role.salary,
+                    //department_id: role.department_id
+                };
 
-       
-        //console.log (roles);
+            });
 
-        connection.queryPromise(`select * FROM employee`)
-            .then( managers =>{
-                managers = managers.map(manager =>{
-                    return {
-                        id: manager.id,
-                        name: manager.first_name + ' ' +  manager.last_name,
-                        //last: manager.last_name,
-                        //role_id: manager.role_id,    
-                        //manager_id: manager.manager_id
-                    };
+
+            //console.log (roles);
+
+            connection.queryPromise(`select * FROM employee`)
+                .then(managers => {
+                    managers = managers.map(manager => {
+                        return {
+                            id: manager.id,
+                            name: manager.first_name + ' ' + manager.last_name,
+                            //last: manager.last_name,
+                            //role_id: manager.role_id,    
+                            //manager_id: manager.manager_id
+                        };
+                    })
+
+                    managers.push({ id: null, name: 'None' });
+                    var person = managers.find(obj=>obj.name === "Chris Pong");
+
+                    console.log("Pong ID is " + person.id);
+
+                    var role = roles.find(obj=>obj.name === "Lawyer");
+
+                    console.log("Lawyer Role ID is " + role.role_id);
+
+
+                    //console.log(roles);
+                    //console.log(managers);
+
+                    //write inquier here.
+                    return inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'first_name',
+                            message: 'Enter the first name of the employee: ',
+                        },
+                        {
+                            type: 'input',
+                            name: 'last_name',
+                            message: 'Enter the last name of the employee: '
+                        },
+                        {
+                            type: 'list',
+                            message: "Select a role for the employee: ",
+                            choices: roles,
+                            name: 'role'
+                        },
+                        {
+                            type: 'list',
+                            message: "Select a manager for the employee: ",
+                            choices: managers,
+                            name: 'manager'
+                        }
+                    ]);
+
+
                 })
-                
-                managers.push({id: null, name: 'None'});
-                console.log (roles);
-                console.log (managers);
+                .then(answers => {
+
+                    //connection.queryPromise('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?,?,?,?);', [
+            /*             answers.first_name,
+                        answers.last_name,
+                        answers.role,
+                        answers.manager */
+                    // ]);
                     
-            })
-    })
+                    console.log (answers.manager);
+                    //console.log (managers);
+
+
+                    console.log ("Employee Saved");
+                    init();
+                    }
+                )
+        })
+
 }
 
 function viewRole() {
