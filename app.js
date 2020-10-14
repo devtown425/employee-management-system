@@ -29,17 +29,29 @@ function init() {
         ],
         name: 'choice'
     })
-    .then((answer) => {
-        if (answer.choice === 'ADD_ROLE') {
-            addRole()
-        }
-        if (answer.choice === 'VIEW_ROLE') {
-            viewRole();
-        }
-        if (answer.choice === 'END') {
-            connection.end();
-        }
-    })
+        .then((answer) => {
+            if (answer.choice === 'ADD_ROLE') {
+                addRole()
+            } else
+                if (answer.choice === 'VIEW_ROLE') {
+                    viewRole();
+                } else
+                    if (answer.choice === 'ADD_EMPLOYEE') {
+                        addEmployee()
+                    } else
+                        if (answer.choice === 'VIEW_EMPLOYEE') {
+                            viewEmployee();
+                        } else 
+                            if (answer.choice === 'ADD_DEPARTMENT') {
+                                addDepartment()
+                        } else
+                            if (answer.choice === 'VIEW_DEPARTMENT') {
+                                viewDepartment();
+                            } else
+                                if (answer.choice === 'END') {
+                                    connection.end();
+                                }
+        })
 }
 
 init();
@@ -91,11 +103,11 @@ function addEmployee() {
 
 function viewRole() {
     connection.queryPromise(`
-        SELECT role.title, role.salary, department.name
+        SELECT role.title, role.salary, department.name as departmentName
         FROM role INNER JOIN department
-        ON role.department_id=role.id`)
-    .then(roles => {
-        console.table(roles);
-        init();
-    });
+        ON department.id=role.department_id`)
+        .then(roles => {
+            console.table(roles);
+            init();
+        });
 }
