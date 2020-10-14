@@ -108,6 +108,8 @@ function addEmployee() {
             };
             
         });
+
+       
         //console.log (roles);
 
         connection.queryPromise(`select * FROM employee`)
@@ -115,13 +117,14 @@ function addEmployee() {
                 managers = managers.map(manager =>{
                     return {
                         id: manager.id,
-                        first: manager.first_name,
-                        last: manager.last_name,
-                        role_id: manager.role_id,    
-                        manager_id: manager.manager_id
+                        name: manager.first_name + ' ' +  manager.last_name,
+                        //last: manager.last_name,
+                        //role_id: manager.role_id,    
+                        //manager_id: manager.manager_id
                     };
                 })
                 
+                managers.push({id: null, name: 'None'});
                 console.log (roles);
                 console.log (managers);
                     
