@@ -96,9 +96,28 @@ function addRole() {
         });
 }
 
+function addDepartment() {
+
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'department',
+            message: 'Enter the department name: ',
+        },
+    ]) .then(answers => {
+    connection.queryPromise('INSERT INTO department (name) VALUES(?);', [
+        answers.department
+    ]);
+    console.log('Department saved.');
+    init();
+})
+
+
+}
+
 function addEmployee() {
-    
-    
+
+
     connection.queryPromise('SELECT * FROM role')
         .then(roles => {
             roles = roles.map(role => {
@@ -165,31 +184,31 @@ function addEmployee() {
                             name: 'manager'
                         }
                     ]);
-                    
+
 
                 })
                 .then(function (answers) {
 
-                    var person = people.find(obj=>obj.name === answers.manager);
-                    console.log (person.id);
-                    role_picked = roles.find(obj=>obj.name === answers.role);
-                    console.log (role_picked.role_id);
-                    
+                    var person = people.find(obj => obj.name === answers.manager);
+                    console.log(person.id);
+                    role_picked = roles.find(obj => obj.name === answers.role);
+                    console.log(role_picked.role_id);
+
 
                     connection.queryPromise('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?,?,?,?);', [
                         answers.first_name,
                         answers.last_name,
                         role_picked.role_id,
-                        person.id 
-                     ]);
-                    
+                        person.id
+                    ]);
+
                     //console.log (answers.manager);
                     //console.log (people);
 
 
-                    console.log ("Employee Saved");
+                    console.log("Employee Saved");
                     init();
-                    }
+                }
                 )
         })
 
@@ -215,4 +234,14 @@ function viewEmployee() {
             console.table(employees);
             init();
         });
+}
+
+function viewDepartment(){
+    connection.queryPromise(`
+        SELECT name
+        FROM department`)
+        .then(department => {
+            console.table(department);
+            init();
+        });    
 }
