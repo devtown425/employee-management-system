@@ -96,43 +96,37 @@ function addRole() {
         });
 }
 
-async function addEmployee() {
-    var positions = await connection.query('SELECT id, title FROM role');
-    var managers = await connection.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee');
-    managers.push({ id: null, Manager: "None" });
+function addEmployee() {
+    connection.queryPromise('SELECT * FROM role')
+    .then(roles => {
+        roles = roles.map(role => {
+            return {
+                value: role.id, 
+                name: role.title,
+                salary: role.salary,
+                department_id: role.department_id
+            };
+            
+        });
+        //console.log (roles);
 
-    inquirer.prompt([
-        {
-            name: "firstName",
-            type: "input",
-            message: "Enter employee's first name:",
-            validate: confirmStringInput
-        },
-        {
-            name: "lastName",
-            type: "input",
-            message: "Enter employee's last name:",
-            validate: confirmStringInput
-        },
-        {
-            name: "role",
-            type: "list",
-            message: "Choose employee role:",
-            choices: positions.map(obj => obj.title)
-        },
-        {
-            name: "manager",
-            type: "list",
-            message: "Choose the employee's manager:",
-            choices: managers.map(obj => obj.Manager)
-        }
-    ]).then(answers => {
-        var positionDetails = positions.find(obj => obj.title === answers.role);
-        var manager = managers.find(obj => obj.Manager === answers.manager);
-        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
-        console.log("employee saved");
-        init();
-    });
+        connection.queryPromise(`select * FROM employee`)
+            .then( managers =>{
+                managers = managers.map(manager =>{
+                    return {
+                        id: manager.id,
+                        first: manager.first_name,
+                        last: manager.last_name,
+                        role_id: manager.role_id,    
+                        manager_id: manager.manager_id
+                    };
+                })
+                
+                console.log (roles);
+                console.log (managers);
+                    
+            })
+    })
 }
 
 function viewRole() {
