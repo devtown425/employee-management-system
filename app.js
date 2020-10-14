@@ -205,3 +205,14 @@ function viewRole() {
             init();
         });
 }
+
+function viewEmployee() {
+    connection.queryPromise(`
+        SELECT employee.first_name, employee.last_name, role.title as roleName
+        FROM employee INNER JOIN role
+        ON employee.role_id=role.id`)
+        .then(employees => {
+            console.table(employees);
+            init();
+        });
+}
