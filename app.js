@@ -118,9 +118,6 @@ function updateEmployeeRole() {
                 return {
                     id: role.id,
                     name: role.title,
-                    //last: manager.last_name,
-                    //role_id: manager.role_id,    
-                    //manager_id: manager.manager_id
                 };
             })
             return inquirer.prompt([
@@ -144,8 +141,6 @@ function updateEmployeeRole() {
         .then(function(answers) {
             var the_person = person.find(obj => obj.name === answers.name);
             var new_role = role_title.find(obj => obj.name === answers.newrole);
-            console.log (the_person.id);
-            console.log (new_role.id);
 
             connection.queryPromise('UPDATE employee SET ? where id = ?', [{role_id: new_role.id}, the_person.id]);
             console.log('Role updated.');
@@ -186,41 +181,19 @@ function addEmployee() {
                 return {
                     role_id: role.id,
                     name: role.title,
-                    //salary: role.salary,
-                    //department_id: role.department_id
                 };
 
             });
 
-
-            //console.log (roles);
-            //var managers;
             connection.queryPromise(`select * FROM employee`)
                 .then(managers => {
                     people = managers.map(manager => {
                         return {
                             id: manager.id,
                             name: manager.first_name + ' ' + manager.last_name,
-                            //last: manager.last_name,
-                            //role_id: manager.role_id,    
-                            //manager_id: manager.manager_id
                         };
                     })
 
-                    //people.push({ id: null, name: 'None' });
-                    //var person = people.find(obj=>obj.name === "Chris Pong");
-
-                    //console.log("Pong ID is " + person.id);
-
-                    //var role = roles.find(obj=>obj.name === "Lawyer");
-
-                    //console.log("Lawyer Role ID is " + role.role_id);
-
-
-                    //console.log(roles);
-                    //console.log(managers);
-
-                    //write inquier here.
                     return inquirer.prompt([
                         {
                             type: 'input',
@@ -252,9 +225,7 @@ function addEmployee() {
                 .then(function (answers) {
 
                     var person = people.find(obj => obj.name === answers.manager);
-                    console.log(person.id);
                     role_picked = roles.find(obj => obj.name === answers.role);
-                    console.log(role_picked.role_id);
 
 
                     connection.queryPromise('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?,?,?,?);', [
@@ -264,8 +235,6 @@ function addEmployee() {
                         person.id
                     ]);
 
-                    //console.log (answers.manager);
-                    //console.log (people);
 
 
                     console.log("Employee Saved");
