@@ -13,6 +13,7 @@ const connection = new mysql.createConnection({
 
 connection.queryPromise = util.promisify(connection.query);
 
+// init function, it starts here
 function init() {
     inquirer.prompt({
         type: 'list',
@@ -60,6 +61,7 @@ function init() {
 
 init();
 
+// add role function
 function addRole() {
     connection.queryPromise('SELECT * FROM department')
         .then(departments => {
@@ -100,6 +102,7 @@ function addRole() {
         });
 }
 
+// update employee function
 function updateEmployeeRole() {
 
     connection.queryPromise('SELECT first_name, last_name, id  FROM employee')
@@ -153,6 +156,7 @@ function updateEmployeeRole() {
 
 }
 
+// add department function
 function addDepartment() {
 
     inquirer.prompt([
@@ -172,6 +176,7 @@ function addDepartment() {
 
 }
 
+// add an employee function
 function addEmployee() {
 
 
@@ -245,6 +250,7 @@ function addEmployee() {
 
 }
 
+// view table function
 function viewRole() {
     connection.queryPromise(`
         SELECT role.title, role.salary, department.name as departmentName
@@ -256,6 +262,7 @@ function viewRole() {
         });
 }
 
+// view employee function
 function viewEmployee() {
     connection.queryPromise(`
         SELECT employee.first_name, employee.last_name, role.title as roleName
@@ -267,6 +274,7 @@ function viewEmployee() {
         });
 }
 
+// view department function
 function viewDepartment() {
     connection.queryPromise(`
         SELECT name
