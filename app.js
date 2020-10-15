@@ -102,7 +102,7 @@ function addRole() {
 
 function updateEmployeeRole() {
 
-    connection.queryPromise('SELECT first_name, last_name  FROM employee')
+    connection.queryPromise('SELECT first_name, last_name, id  FROM employee')
     .then(employees => {
         person = employees.map(employee => {
             return {
@@ -143,14 +143,11 @@ function updateEmployeeRole() {
 
         .then(function(answers) {
             var the_person = person.find(obj => obj.name === answers.name);
-            var new_role = role_title.find(obj => obj.title === answers.newrole);
-            console.log (the_person);
-            console.log (new_role);
+            var new_role = role_title.find(obj => obj.name === answers.newrole);
+            console.log (the_person.id);
+            console.log (new_role.id);
 
-            connection.queryPromise('UPDATE employee SET (role_id) where id = (id) VALUES(?,?);', [
-                new_role.id,
-                the_person.id
-            ]);
+            connection.queryPromise('UPDATE employee SET ? where id = ?', [{role_id: new_role.id}, the_person.id]);
             console.log('Role updated.');
             init();
         });
